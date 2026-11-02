@@ -47,6 +47,68 @@ pip install -r requirements.txt
 Paste a sample of your app's CLI or Streamlit output here so a reader can see what a generated plan looks like:
 
 ```
+==========================================
+           TODAY'S SCHEDULE
+==========================================
+Owner: Amelia
+
+7:30 AM
+------------------------------------------
+  Task:      Walk Toffee
+  Pet:       Toffee
+  Duration:  30 minutes
+  Priority:  High
+  Frequency: Daily
+
+  Task:      Walk Chuy
+  Pet:       Chuy
+  Duration:  30 minutes
+  Priority:  High
+  Frequency: Daily
+
+
+6:00 PM
+------------------------------------------
+  Task:      Bathe Toffee
+  Pet:       Toffee
+  Duration:  30 minutes
+  Priority:  Medium
+  Frequency: Every two weeks
+
+
+6:30 PM
+------------------------------------------
+  Task:      Bathe Chuy
+  Pet:       Chuy
+  Duration:  30 minutes
+  Priority:  Medium
+  Frequency: Every two weeks
+
+
+7:15 PM
+------------------------------------------
+  Task:      Cut Toffee's nails
+  Pet:       Toffee
+  Duration:  15 minutes
+  Priority:  Low
+  Frequency: Every two weeks
+
+
+7:30 PM
+------------------------------------------
+  Task:      Cut Chuy's nails
+  Pet:       Chuy
+  Duration:  15 minutes
+  Priority:  Low
+  Frequency: Every two weeks
+
+==========================================
+CONFLICT REMINDERS
+==========================================
+- Reminder: Walk Toffee and Walk Chuy overlap.
+```
+
+```
 # e.g.:
 # Daily plan for Biscuit (Golden Retriever):
 #   08:00 — Morning walk (30 min) [priority: high]

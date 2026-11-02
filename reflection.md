@@ -2,15 +2,35 @@
 
 ## 1. System Design
 
+Core Actions:
+- Register a pet
+- Schedule tasks about the pet
+- Sort the schedule and making it viewable.
+
 **a. Initial design**
 
 - Briefly describe your initial UML design.
+
+My initial UML design is simply connecting objects to organize pet care: an owner has pets, pets have tasks, and schedule manager organizes all the information.
+
 - What classes did you include, and what responsibilities did you assign to each?
+
+Class: Owner, Pet, Tasks, and Schedule.
+Owner class: Manages the users profiles information (name, contact information, insurance), it also contain a list of the user's pets on the app record.
+Pet class: Stores each individual animal detaisl (name, bred type, age, medical hisotry), as well tracks each task that was assigned to them from the pet's owner.
+Tasks class: Holds care activity details (start time of the task, duration, priority levle, completion status).
+Schedule class: Response for sorting each of the task in order of priority, chronologically, and inspecting for schedule conflicts. 
+
 
 **b. Design changes**
 
 - Did your design change during implementation?
+
+Yes, I made changes to classes skeletion after review it with my AI coding assistant. 
+
 - If yes, describe at least one change and why you made it.
+
+the changes I have made with AI are: adding a direct pet relationship to task, so the program can identify which task belongs to which pet. Set a default task frequency, so the tasks can supporot the planned value of "once" and "daily", as well as the default value of one-time tasks when they are new task inputed. Final change is added owner avaiability to schedule class, so the schedule class can determine when an owner is avialable or not.
 
 ---
 

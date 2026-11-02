@@ -1,0 +1,49 @@
+classDiagram
+    class Task {
+        +String description
+        +String start_time
+        +Integer duration_minutes
+        +String priority_level
+        +String frequency
+        +Boolean completed
+        +Pet pet
+        +mark_complete()
+        +update_priority(new_priority)
+    }
+
+    class Pet {
+        +String name
+        +String species
+        +String breed_type
+        +Integer age
+        +List medication_history
+        +List tasks
+        +add_task(task)
+        +add_medical_record(record)
+    }
+
+    class Owner {
+        +String first_name
+        +String last_name
+        +Integer age
+        +String contact_info
+        +String insurance_info
+        +List pets
+        +add_pet(pet)
+        +get_all_tasks()
+    }
+
+    class Schedule {
+        +Owner owner
+        +String available_start_time
+        +String available_end_time
+        +sort_by_time()
+        +sort_by_priority()
+        +detect_conflicts()
+    }
+
+    Owner "1" *-- "0..*" Pet : owns
+    Pet "1" *-- "0..*" Task : has tasks
+    Task "*" --> "1" Pet : belongs to
+    Schedule "1" --> "1" Owner : manages schedule for
+    Schedule ..> Task : sorts and checks
