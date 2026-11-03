@@ -3,11 +3,11 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import date, datetime, timedelta
 
 
 VALID_PRIORITIES = {"low", "medium", "high"}
-VALID_FREQUENCIES = {"once", "daily", "biweekly"}
+VALID_FREQUENCIES = {"once", "daily", "weekly", "biweekly"}
 
 # These are the main changes made during implementation.
 # Tasks now support pet relationships, validation, and biweekly care.
@@ -36,10 +36,42 @@ class Task:
     frequency: str = "once"
     completed: bool = False
     pet: Pet | None = None
+    due_date: date = field(default_factory=date.today)
 
-    def mark_complete(self) -> None:
-        """Mark this task as completed."""
+    def _recurrence_days(self) -> int | None:
+        """Return the interval, in days, for this task's recurrence."""
+        recurrence_days = {
+            "daily": 1,
+            "weekly": 7,
+            "biweekly": 14,
+        }
+        return recurrence_days.get(self.frequency)
+
+    def mark_complete(self) -> Task | None:
+        """Complete the task and add its next occurrence when it recurs.
+
+        Returns:
+            The new incomplete task for a recurring task, or ``None`` for
+            one-time tasks, unassigned tasks, or tasks already completed.
+        """
+        if self.completed:
+            return None
+
         self.completed = True
+        days_until_next = self._recurrence_days()
+        if days_until_next is None or self.pet is None:
+            return None
+
+        next_task = Task(
+            description=self.description,
+            start_time=self.start_time,
+            duration_minutes=self.duration_minutes,
+            priority_level=self.priority_level,
+            frequency=self.frequency,
+            due_date=self.due_date + timedelta(days=days_until_next),
+        )
+        self.pet.add_task(next_task)
+        return next_task
 
     def update_priority(self, new_priority: str) -> None:
         """Update the task priority after checking its value."""
@@ -122,16 +154,26 @@ class Schedule:
     available_start_time: str = ""
     available_end_time: str = ""
 
+    @staticmethod
+    def _task_start_minutes(task: Task) -> int:
+        """Convert a task's HH:MM start time to minutes after midnight."""
+        return _time_as_minutes(task.start_time)
+
+    @classmethod
+    def _task_end_minutes(cls, task: Task) -> int:
+        """Return the minutes after midnight when a task ends."""
+        return cls._task_start_minutes(task) + task.duration_minutes
+
     def sort_by_time(self) -> list[Task]:
-        """Return the owner's tasks in time order."""
+        """Return all owner tasks sorted by their HH:MM start time.
+
+        Tasks without a start time are placed after tasks with scheduled
+        times. The owner's original task lists are not changed.
+        """
         tasks = self.owner.get_all_tasks()
         return sorted(
             tasks,
-            key=lambda task: (
-                _time_as_minutes(task.start_time)
-                if task.start_time
-                else float("inf")
-            ),
+            key=lambda task: (not bool(task.start_time), task.start_time),
         )
 
     def sort_by_priority(self) -> list[Task]:
@@ -142,8 +184,29 @@ class Schedule:
             key=lambda task: priority_order[task.priority_level],
         )
 
+    def filter_tasks(self, pet_name: str, completed: bool) -> list[Task]:
+        """Return tasks matching both a pet name and completion status.
+
+        Pet-name matching ignores surrounding whitespace and capitalization.
+        """
+        tasks = self.owner.get_all_tasks()
+        normalized_name = pet_name.strip().lower()
+        return [
+            task
+            for task in tasks
+            if (
+                task.pet is not None
+                and task.pet.name.strip().lower() == normalized_name
+                and task.completed is completed
+            )
+        ]
+
     def detect_conflicts(self) -> list[tuple[Task, Task]]:
-        """Return pairs of tasks whose scheduled times overlap."""
+        """Return pairs of scheduled tasks with overlapping time ranges.
+
+        Tasks that start exactly when another task ends are considered
+        back-to-back rather than conflicting.
+        """
         scheduled_tasks = [
             task for task in self.owner.get_all_tasks() if task.start_time
         ]
@@ -151,11 +214,33 @@ class Schedule:
 
         conflicts: list[tuple[Task, Task]] = []
         for index, first_task in enumerate(scheduled_tasks):
-            first_start = _time_as_minutes(first_task.start_time)
-            first_end = first_start + first_task.duration_minutes
+            first_end = self._task_end_minutes(first_task)
             for second_task in scheduled_tasks[index + 1 :]:
-                second_start = _time_as_minutes(second_task.start_time)
+                second_start = self._task_start_minutes(second_task)
                 if second_start >= first_end:
                     break
                 conflicts.append((first_task, second_task))
         return conflicts
+
+    def conflict_warnings(self) -> list[str]:
+        """Return warning messages for same-pet and different-pet overlaps.
+
+        The method reports conflicts as messages instead of raising errors,
+        allowing the caller to display warnings while the program continues.
+        """
+        warnings = []
+        for first_task, second_task in self.detect_conflicts():
+            first_pet = first_task.pet.name if first_task.pet else "Unknown pet"
+            second_pet = second_task.pet.name if second_task.pet else "Unknown pet"
+            if first_task.pet is second_task.pet:
+                warnings.append(
+                    f"Warning: {first_pet}'s tasks "
+                    f"'{first_task.description}' and "
+                    f"'{second_task.description}' overlap."
+                )
+            else:
+                warnings.append(
+                    f"Warning: {first_task.description} for {first_pet} and "
+                    f"{second_task.description} for {second_pet} overlap."
+                )
+        return warnings

@@ -138,10 +138,10 @@ Sample test output:
 
 | Feature | Method(s) | Notes |
 |---------|-----------|-------|
-| Task sorting | | e.g., by priority, duration |
-| Filtering | | e.g., skip tasks if time runs out |
-| Conflict handling | | e.g., overlapping time slots |
-| Recurring tasks | | e.g., daily vs. weekly |
+| Task sorting | `Schedule.sort_by_time()` | Sorts all owner tasks by their start time in `HH:MM` format. Tasks without a time go at the end. |
+| Filtering | `Schedule.filter_tasks()` | Shows tasks for one pet and checks whether they are completed or incomplete. |
+| Conflict handling | `Schedule.detect_conflicts()` and `Schedule.conflict_warnings()` | Checks whether task times overlap based on each task's start time and duration. It checks tasks for the same pet and different pets, then returns a warning instead of stopping the program. |
+| Recurring tasks | `Task.mark_complete()` and `Task._recurrence_days()` | When a daily, weekly, or biweekly task is completed, it creates a new task for the next due date. |
 
 ## 📸 Demo Walkthrough
 

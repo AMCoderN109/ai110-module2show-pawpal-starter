@@ -44,7 +44,13 @@ the changes I have made with AI are: adding a direct pet relationship to task, s
 **b. Tradeoffs**
 
 - Describe one tradeoff your scheduler makes.
+
+One tradeoff my schedule makes is that it checks for any overlapping tasks instead of only checking whether two or more tasks have the exact same start time. With the note that this may cause it to create more warnings.
+
 - Why is that tradeoff reasonable for this scenario?
+
+This tradeoff is reasonable for this scenario because users (pet owners) would prefer to receive multiple warnings and reminders rather than miss one and get informed at the last minute that two or more tasks need equal attention at the same time.
+
 
 ---
 

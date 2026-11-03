@@ -74,7 +74,7 @@ with col3:
 with col4:
     start_time = st.text_input("Start time (HH:MM)", value="08:00")
 
-frequency = st.selectbox("Frequency", ["once", "daily", "biweekly"])
+frequency = st.selectbox("Frequency", ["once", "daily", "weekly", "biweekly"])
 
 if owner.pets:
     selected_pet_name = st.selectbox(

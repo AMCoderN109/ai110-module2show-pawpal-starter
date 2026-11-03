@@ -6,6 +6,7 @@ def format_frequency(frequency: str) -> str:
     labels = {
         "once": "Once",
         "daily": "Daily",
+        "weekly": "Weekly",
         "biweekly": "Every two weeks",
     }
     return labels[frequency]
@@ -37,11 +38,21 @@ def main() -> None:
 
     toffee.add_task(
         Task(
-            description="Walk Toffee",
-            start_time="07:30",
+            description="Bathe Toffee",
+            start_time="18:00",
             duration_minutes=30,
-            priority_level="high",
-            frequency="daily",
+            priority_level="medium",
+            frequency="biweekly",
+            completed=True,
+        )
+    )
+    chuy.add_task(
+        Task(
+            description="Bathe Chuy",
+            start_time="18:30",
+            duration_minutes=30,
+            priority_level="medium",
+            frequency="biweekly",
         )
     )
     chuy.add_task(
@@ -55,29 +66,20 @@ def main() -> None:
     )
     toffee.add_task(
         Task(
-            description="Bathe Toffee",
-            start_time="18:00",
-            duration_minutes=30,
-            priority_level="medium",
-            frequency="biweekly",
-        )
-    )
-    chuy.add_task(
-        Task(
-            description="Bathe Chuy",
-            start_time="18:30",
-            duration_minutes=30,
-            priority_level="medium",
-            frequency="biweekly",
-        )
-    )
-    toffee.add_task(
-        Task(
             description="Cut Toffee's nails",
             start_time="19:15",
             duration_minutes=15,
             priority_level="low",
             frequency="biweekly",
+        )
+    )
+    toffee.add_task(
+        Task(
+            description="Walk Toffee",
+            start_time="07:30",
+            duration_minutes=30,
+            priority_level="high",
+            frequency="daily",
         )
     )
     chuy.add_task(
@@ -113,17 +115,24 @@ def main() -> None:
         print(f"  Frequency: {format_frequency(task.frequency)}")
         print()
 
-    conflicts = schedule.detect_conflicts()
-    # Keep conflicts as reminders, even when two pets share the same activity time.
+    filtered_tasks = schedule.filter_tasks(
+        pet_name="Toffee",
+        completed=False,
+    )
+    print("=" * 42)
+    print("INCOMPLETE TASKS FOR TOFFEE")
+    print("=" * 42)
+    for task in scheduled_tasks:
+        if task in filtered_tasks:
+            print(f"- {format_time(task.start_time)} - {task.description}")
+
+    conflict_warnings = schedule.conflict_warnings()
     print("=" * 42)
     print("CONFLICT REMINDERS")
     print("=" * 42)
-    if conflicts:
-        for first_task, second_task in conflicts:
-            print(
-                f"- Reminder: {first_task.description} and "
-                f"{second_task.description} overlap."
-            )
+    if conflict_warnings:
+        for warning in conflict_warnings:
+            print(f"- {warning}")
     else:
         print("No overlapping tasks detected.")
 
