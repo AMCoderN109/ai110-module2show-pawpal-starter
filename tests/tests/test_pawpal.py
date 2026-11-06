@@ -107,3 +107,48 @@ def test_back_to_back_tasks_do_not_create_conflict_warning() -> None:
     owner = Owner(pets=[pet])
 
     assert Schedule(owner).conflict_warnings() == []
+
+
+def test_tasks_are_sorted_in_chronological_order() -> None:
+    pet = Pet(name="Toffee")
+    pet.add_task(Task(description="Evening walk", start_time="18:00"))
+    pet.add_task(Task(description="Morning walk", start_time="08:00"))
+    owner = Owner(pets=[pet])
+
+    sorted_tasks = Schedule(owner).sort_by_time()
+
+    assert [task.description for task in sorted_tasks] == [
+        "Morning walk",
+        "Evening walk",
+    ]
+
+
+def test_completing_daily_task_creates_task_for_following_day() -> None:
+    pet = Pet(name="Toffee")
+    task = Task(
+        description="Daily medication",
+        frequency="daily",
+        due_date=date(2026, 11, 6),
+    )
+    pet.add_task(task)
+
+    next_task = task.mark_complete()
+
+    assert next_task is not None
+    assert task.completed is True
+    assert next_task.completed is False
+    assert next_task.due_date == date(2026, 11, 7)
+    assert next_task.pet is pet
+
+
+def test_scheduler_flags_tasks_with_duplicate_start_times() -> None:
+    pet = Pet(name="Toffee")
+    pet.add_task(Task(description="Walk", start_time="08:00", duration_minutes=30))
+    pet.add_task(Task(description="Medication", start_time="08:00", duration_minutes=10))
+    owner = Owner(pets=[pet])
+
+    warnings = Schedule(owner).conflict_warnings()
+
+    assert warnings == [
+        "Warning: Toffee's tasks 'Walk' and 'Medication' overlap."
+    ]

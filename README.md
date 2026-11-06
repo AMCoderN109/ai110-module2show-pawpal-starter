@@ -120,17 +120,30 @@ CONFLICT REMINDERS
 
 ```bash
 # Run the full test suite:
-pytest
+python -m pytest
 
-# Run with coverage:
-pytest --cov
+# The tests cover task completion, recurring tasks, chronological sorting,
+# task filtering, and conflict detection, including duplicate start times.
+
+# Run the full test suite with coverage:
+python -m pytest --cov
 ```
 
 Sample test output:
 
+```text
+=========================================================== test session starts ===========================================================
+platform win32 -- Python 3.13.15, pytest-9.1.1, pluggy-1.6.0
+rootdir: C:\Users\Amelia\Desktop\VSCode Projects\ai110-module2show-pawpal-starter
+plugins: anyio-4.11.0
+collected 11 items
+
+tests\tests\test_pawpal.py ...........                                                                                               [100%]
+
+=========================================================== 11 passed in 0.17s ============================================================
 ```
-# Paste your pytest output here
-```
+
+**Confidence Level:** ★★★★☆ (4/5)
 
 ## 📐 Smarter Scheduling
 
