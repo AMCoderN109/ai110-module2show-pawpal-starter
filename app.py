@@ -117,19 +117,63 @@ else:
 st.divider()
 
 st.subheader("Build Schedule")
-st.caption("Generate an ordered schedule from the tasks you created.")
+st.caption("Generate an organized schedule and review conflicts.")
 
-if st.button("Generate schedule"):
+if owner.get_all_tasks():
     schedule = Schedule(owner)
     scheduled_tasks = schedule.sort_by_time()
-    st.write("Today's schedule:")
-    for task in scheduled_tasks:
-        pet_name = task.pet.name if task.pet else "Unknown"
-        st.write(
-            f"{task.start_time} - {task.description} for {pet_name} "
-            f"({task.duration_minutes} minutes, {task.priority_level} priority)"
-        )
 
-    conflicts = schedule.detect_conflicts()
-    if conflicts:
-        st.warning(f"{len(conflicts)} scheduling conflict reminder(s) found.")
+    st.write("Today's schedule:")
+    st.table(
+        [
+            {
+                "Time": task.start_time or "Unscheduled",
+                "Pet": task.pet.name if task.pet else "Unknown",
+                "Task": task.description,
+                "Duration": f"{task.duration_minutes} minutes",
+                "Priority": task.priority_level.title(),
+                "Frequency": task.frequency.title(),
+                "Status": "Completed" if task.completed else "Incomplete",
+            }
+            for task in scheduled_tasks
+        ]
+    )
+
+    conflict_warnings = schedule.conflict_warnings()
+    if conflict_warnings:
+        st.warning("Scheduling conflicts found:")
+        for warning in conflict_warnings:
+            st.write(f"- {warning}")
+    else:
+        st.success("No scheduling conflicts detected.")
+
+    st.subheader("Filter Tasks")
+    filter_pet = st.selectbox(
+        "Choose a pet",
+        [pet.name for pet in owner.pets],
+    )
+    show_completed = st.checkbox("Show completed tasks", value=False)
+
+    filtered_tasks = schedule.filter_tasks(
+        pet_name=filter_pet,
+        completed=show_completed,
+    )
+
+    if filtered_tasks:
+        st.table(
+            [
+                {
+                    "Time": task.start_time or "Unscheduled",
+                    "Task": task.description,
+                    "Duration": f"{task.duration_minutes} minutes",
+                    "Priority": task.priority_level.title(),
+                    "Status": "Completed" if task.completed else "Incomplete",
+                }
+                for task in filtered_tasks
+            ]
+        )
+        st.success(f"{len(filtered_tasks)} matching task(s) found.")
+    else:
+        st.info("No matching tasks found.")
+else:
+    st.info("Add at least one task before generating a schedule.")

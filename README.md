@@ -156,14 +156,91 @@ tests\tests\test_pawpal.py ...........                                          
 | Conflict handling | `Schedule.detect_conflicts()` and `Schedule.conflict_warnings()` | Checks whether task times overlap based on each task's start time and duration. It checks tasks for the same pet and different pets, then returns a warning instead of stopping the program. |
 | Recurring tasks | `Task.mark_complete()` and `Task._recurrence_days()` | When a daily, weekly, or biweekly task is completed, it creates a new task for the next due date. |
 
-## 📸 Demo Walkthrough
+## Demo Walkthrough
 
-Describe your app in numbered steps so a reader can follow along without watching a video:
+1. Enter the owner's name (e.g., Amelia), pet name (e.g., Ruby), and species (e.g., mixed breed).
+2. Click "Add Pet" to add the pet to the owner's list.
+3. Enter a task (e.g., Bathtime), duration (e.g., 1 hour), priority (e.g., medium), start time (e.g., 9:00 AM), and frequency (e.g., bi-weekly).
+4. Once you enter a task, select one of your listed pets to place the task into that pet's empty or existing task schedule.
+5. Open the "Build Schedule" section to see all available tasks in chronological order.
+6. Review the conflict warnings for overlapping tasks, if any overlapping tasks are found.
+7. You could also filter the task schedule by pet and completion status.
 
-1. <!-- Describe this step -->
-2. <!-- Describe this step -->
-3. <!-- Describe this step -->
-4. <!-- Describe this step -->
-5. <!-- Add more steps as needed -->
+### Example workflow
 
-**Screenshot or video** *(optional)*: <!-- Insert a screenshot or link to a demo video here -->
+A user enters Amelia as the owner's name, Ruby as the pet's name, and mixed breed as the species. After clicking "Add Pet", the user creates a bi-weekly Bathtime task for Ruby with a duration of 1 hour, medium priority, and a 9:00 AM start time. The user then builds the schedule to review the sorted task list and checks for any conflict warnings.
+
+PawPal+ also supports daily, weekly, and bi-weekly recurring tasks. Completing one of these tasks creates the next occurrence with the appropriate due date. One-time tasks are marked complete without creating another task.
+
+### Sample CLI output
+
+Run the command below from the project root:
+
+```bash
+python main.py
+```
+
+Example output:
+
+```text
+==========================================
+           TODAY'S SCHEDULE
+==========================================
+Owner: Amelia
+
+7:30 AM
+------------------------------------------
+  Task:      Walk Toffee
+  Pet:       Toffee
+  Duration:  30 minutes
+  Priority:  High
+  Frequency: Daily
+
+  Task:      Walk Chuy
+  Pet:       Chuy
+  Duration:  30 minutes
+  Priority:  High
+  Frequency: Daily
+
+6:00 PM
+------------------------------------------
+  Task:      Bathe Toffee
+  Pet:       Toffee
+  Duration:  30 minutes
+  Priority:  Medium
+  Frequency: Every two weeks
+
+6:30 PM
+------------------------------------------
+  Task:      Bathe Chuy
+  Pet:       Chuy
+  Duration:  30 minutes
+  Priority:  Medium
+  Frequency: Every two weeks
+
+7:15 PM
+------------------------------------------
+  Task:      Cut Toffee's nails
+  Pet:       Toffee
+  Duration:  15 minutes
+  Priority:  Low
+  Frequency: Every two weeks
+
+7:30 PM
+------------------------------------------
+  Task:      Cut Chuy's nails
+  Pet:       Chuy
+  Duration:  15 minutes
+  Priority:  Low
+  Frequency: Every two weeks
+
+==========================================
+INCOMPLETE TASKS FOR TOFFEE
+==========================================
+- 7:30 AM - Walk Toffee
+- 7:15 PM - Cut Toffee's nails
+==========================================
+CONFLICT REMINDERS
+==========================================
+- Warning: Walk Toffee for Toffee and Walk Chuy for Chuy overlap.
+```
